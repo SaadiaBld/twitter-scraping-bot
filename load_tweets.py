@@ -25,16 +25,24 @@ query = ('("Leroy Merlin" OR @LeroyMerlinFR OR @leroymerlin) '
          '-"arnaque" -"escroquerie" -"millions" -"examen" -"Amazon" -"Zulon" '
          '-is:retweet lang:fr')
 
-# Récupérer les tweets récents (max 100, car c'est la limite de l'API gratuite)
-tweets = client.search_recent_tweets(query=query, max_results=100, tweet_fields=["created_at"])
+# Fonction de filtrage : garder seulement les tweets contenant certains mots-clés
+def est_tweet_pertinent(texte):
+    mots_cles = ["commande", "livraison", "colis", "remboursement", "expédition", "retard", "transporteur",'transport', ]
+    return any(mot in texte.lower() for mot in mots_cles)
+
+# Récupérer les tweets récents (max 25, pour respecter le quota de 100/mois gratuites))
+tweets = client.search_recent_tweets(query=query, max_results=1, tweet_fields=["created_at"])
 
 # Stocker les tweets dans une liste
 tweet_data = []
 
 if tweets.data:
     for tweet in tweets.data:
-        if str(tweet.id) not in existing_ids:  # Éviter les doublons
-            tweet_data.append([tweet.id, tweet.text, tweet.created_at])
+        if str(tweet.id) not in existing_ids:
+            if est_tweet_pertinent(tweet.text):
+                tweet_data.append([tweet.id, tweet.text, tweet.created_at])
+            else:
+                print(f"Tweets ignorés: {tweet.text}")
 
     if tweet_data:
         df_temp = pd.DataFrame(tweet_data, columns=["ID", "Texte", "Date"])
@@ -45,6 +53,6 @@ if tweets.data:
 
         print(f"{len(df_temp)} nouveaux tweets ajoutés à {csv_file} !")
     else:
-        print("Aucun nouveau tweet trouvé (ils existent déjà dans le fichier).")
+        print("Aucun nouveau tweet trouvé.")
 else:
     print("Aucun tweet trouvé.")

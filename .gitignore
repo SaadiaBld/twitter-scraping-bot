@@ -190,4 +190,6 @@ pyrightconfig.json
 
 # Personal files for the current project:
 brouillons/
+tweets_leroymerlin_livraison.csv
 # End of https://www.toptal.com/developers/gitignore/api/python,linux
+
