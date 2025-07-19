@@ -36,7 +36,7 @@ csv_file = "tweets_leroymerlin_livraison.csv"
 df = pd.read_csv(csv_file, dtype={"ID": str})
 
 # Ajouter une colonne avec le tweet nettoyé
-df["tweet_nettoye"] = df["tweet"].apply(preprocess_tweet)
+df["tweet_nettoye"] = df["Texte"].apply(preprocess_tweet)
 
 # Sauvegarder les deux versions dans un CSV
 df.to_csv("tweets_nettoyes.csv", index=False, encoding="utf-8")

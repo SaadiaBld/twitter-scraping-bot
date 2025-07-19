@@ -31,14 +31,17 @@ def est_tweet_pertinent(texte):
     return any(mot in texte.lower() for mot in mots_cles)
 
 # Récupérer les tweets récents (max 25, pour respecter le quota de 100/mois gratuites))
-tweets = client.search_recent_tweets(query=query, max_results=1, tweet_fields=["created_at"])
+tweets = client.search_recent_tweets(query=query, max_results=25, tweet_fields=["created_at", "author_id"], 
+                                      expansions=["author_id"])
 
 # Stocker les tweets dans une liste
 tweet_data = []
-
+leroy_merlin_ids = {"32358920"}  # IDs de Leroy Merlin pour éviter les doublons
 if tweets.data:
     for tweet in tweets.data:
         if str(tweet.id) not in existing_ids:
+            if str(tweet.author_id) in leroy_merlin_ids:
+                continue
             if est_tweet_pertinent(tweet.text):
                 tweet_data.append([tweet.id, tweet.text, tweet.created_at])
             else:
